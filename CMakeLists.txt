@@ -25,6 +25,8 @@ add_library(${PROJECT_NAME}
   src/electronic-ids/pcsc/EstEIDIDEMIA.hpp
   src/electronic-ids/pcsc/FinEID.cpp
   src/electronic-ids/pcsc/FinEID.hpp
+  src/electronic-ids/pcsc/PIV.cpp
+  src/electronic-ids/pcsc/PIV.hpp
   src/electronic-ids/pcsc/LatEIDIDEMIACommon.hpp
   src/electronic-ids/pcsc/LatEIDIDEMIAv1.cpp
   src/electronic-ids/pcsc/LatEIDIDEMIAv1.hpp
