@@ -111,6 +111,18 @@ std::string belgianPkcs11ModulePath()
 #endif
 }
 
+std::string pivPkcs11ModulePath()
+{
+#ifdef _WIN32
+    return wstringToString(programFilesPath()
+                           + L"\\OpenSC Project\\OpenSC\\pkcs11\\opensc-pkcs11.dll"s);
+#elif defined __APPLE__
+    return "/Library/OpenSC/lib/opensc-pkcs11.so"s;
+#else // Linux
+    return "/usr/lib/"s; # TODO:
+#endif
+}
+
 const std::map<electronic_id::Pkcs11ElectronicIDType, electronic_id::Pkcs11ElectronicIDModule>
     SUPPORTED_PKCS11_MODULES = {
         // EstEIDIDEMIAV1 configuration is here only for testing,
@@ -178,6 +190,17 @@ const std::map<electronic_id::Pkcs11ElectronicIDType, electronic_id::Pkcs11Elect
 
              electronic_id::JsonWebSignatureAlgorithm::RS256, // authSignatureAlgorithm
              electronic_id::ELLIPTIC_CURVE_SIGNATURE_ALGOS(), // supportedSigningAlgorithms
+             3,
+             true,
+         }},
+        {electronic_id::Pkcs11ElectronicIDType::PivEID,
+         {
+             "PIV FIPS 201-3 (PKCS#11)"s, // name
+             electronic_id::ElectronicID::Type::PivEID, // type
+             pivPkcs11ModulePath(), // path
+
+             electronic_id::JsonWebSignatureAlgorithm::RS256, // authSignatureAlgorithm
+             electronic_id::RSA_SIGNATURE_ALGOS(), // supportedSigningAlgorithms
              3,
              true,
          }},

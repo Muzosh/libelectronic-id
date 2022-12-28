@@ -49,6 +49,7 @@ public:
         HrvEID,
         BelEIDV1_7,
         BelEIDV1_8,
+        PivEID,
 #ifdef _WIN32
         MsCryptoApiEID,
 #endif
