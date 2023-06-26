@@ -79,9 +79,9 @@ TEST(electronic_id_test, selectCertificateEstIDEMIA)
     EXPECT_EQ(authAlgo, JsonWebSignatureAlgorithm::ES384);
     const HashAlgorithm hashAlgo = authAlgo.hashAlgorithm();
 
-    const pcsc_cpp::byte_vector authPin = {'1', '2', '3', '4'};
-    const pcsc_cpp::byte_vector dataToSign = {'H', 'e', 'l', 'l', 'o', ' ',
-                                              'w', 'o', 'r', 'l', 'd', '!'};
+    const electronic_id::byte_vector authPin = {'1', '2', '3', '4'};
+    const electronic_id::byte_vector dataToSign = {'H', 'e', 'l', 'l', 'o', ' ',
+                                                   'w', 'o', 'r', 'l', 'd', '!'};
     const auto hash = calculateDigest(hashAlgo, dataToSign);
     const auto authSignature = cardInfo->eid().signWithAuthKey(authPin, hash);
     if (!verify(hashAlgo, certificateAuth, dataToSign, authSignature, false)) {
@@ -96,7 +96,7 @@ TEST(electronic_id_test, selectCertificateEstIDEMIA)
     EXPECT_EQ(signingRetriesLeft.first, 3u);
     EXPECT_EQ(signingRetriesLeft.second, 3);
 
-    const pcsc_cpp::byte_vector signPin = {'1', '2', '3', '4', '5'};
+    const electronic_id::byte_vector signPin = {'1', '2', '3', '4', '5'};
     EXPECT_EQ(cardInfo->eid().isSupportedSigningHashAlgorithm(hashAlgo), true);
     const auto signSignature = cardInfo->eid().signWithSigningKey(signPin, hash, hashAlgo);
     EXPECT_EQ(signSignature.second, SignatureAlgorithm::ES384);
@@ -127,9 +127,9 @@ TEST(electronic_id_test, selectCertificateFinV3)
     EXPECT_EQ(authAlgo, JsonWebSignatureAlgorithm::PS256);
     const HashAlgorithm hashAlgo = authAlgo.hashAlgorithm();
 
-    const pcsc_cpp::byte_vector authPin = {'1', '2', '3', '4'};
-    const pcsc_cpp::byte_vector dataToSign = {'H', 'e', 'l', 'l', 'o', ' ',
-                                              'w', 'o', 'r', 'l', 'd', '!'};
+    const electronic_id::byte_vector authPin = {'1', '2', '3', '4'};
+    const electronic_id::byte_vector dataToSign = {'H', 'e', 'l', 'l', 'o', ' ',
+                                                   'w', 'o', 'r', 'l', 'd', '!'};
     const auto hash = calculateDigest(hashAlgo, dataToSign);
     const auto authSignature = cardInfo->eid().signWithAuthKey(authPin, hash);
     if (!verify(hashAlgo, certificateAuth, dataToSign, authSignature, true)) {
@@ -144,7 +144,7 @@ TEST(electronic_id_test, selectCertificateFinV3)
     EXPECT_EQ(signingRetriesLeft.first, 5u);
     EXPECT_EQ(signingRetriesLeft.second, 5);
 
-    const pcsc_cpp::byte_vector signPin = {'1', '2', '3', '4', '5', '6'};
+    const electronic_id::byte_vector signPin = {'1', '2', '3', '4', '5', '6'};
     EXPECT_EQ(cardInfo->eid().isSupportedSigningHashAlgorithm(hashAlgo), true);
     const auto signSignature = cardInfo->eid().signWithSigningKey(signPin, hash, hashAlgo);
     EXPECT_EQ(signSignature.second, SignatureAlgorithm::ES256);
@@ -175,9 +175,9 @@ TEST(electronic_id_test, selectCertificateLat_V1)
     EXPECT_EQ(authAlgo, JsonWebSignatureAlgorithm::RS256);
     const HashAlgorithm hashAlgo = authAlgo.hashAlgorithm();
 
-    const pcsc_cpp::byte_vector authPin = {'1', '2', '3', '4'};
-    const pcsc_cpp::byte_vector dataToSign = {'H', 'e', 'l', 'l', 'o', ' ',
-                                              'w', 'o', 'r', 'l', 'd', '!'};
+    const electronic_id::byte_vector authPin = {'1', '2', '3', '4'};
+    const electronic_id::byte_vector dataToSign = {'H', 'e', 'l', 'l', 'o', ' ',
+                                                   'w', 'o', 'r', 'l', 'd', '!'};
     const auto hash = calculateDigest(hashAlgo, dataToSign);
     const auto authSignature = cardInfo->eid().signWithAuthKey(authPin, hash);
     if (!verify(hashAlgo, certificateAuth, dataToSign, authSignature, false)) {
@@ -192,7 +192,7 @@ TEST(electronic_id_test, selectCertificateLat_V1)
     EXPECT_EQ(signingRetriesLeft.first, 3u);
     EXPECT_EQ(signingRetriesLeft.second, 3);
 
-    const pcsc_cpp::byte_vector signPin = {'1', '2', '3', '4', '5', '6'};
+    const electronic_id::byte_vector signPin = {'1', '2', '3', '4', '5', '6'};
     EXPECT_EQ(cardInfo->eid().isSupportedSigningHashAlgorithm(hashAlgo), true);
     const auto signSignature = cardInfo->eid().signWithSigningKey(signPin, hash, hashAlgo);
     EXPECT_EQ(signSignature.second, SignatureAlgorithm::RS256);
@@ -223,9 +223,9 @@ TEST(electronic_id_test, selectCertificateLatV2)
     EXPECT_EQ(authAlgo, JsonWebSignatureAlgorithm::RS256);
     const HashAlgorithm hashAlgo = authAlgo.hashAlgorithm();
 
-    const pcsc_cpp::byte_vector authPin = {'1', '2', '3', '4'};
-    const pcsc_cpp::byte_vector dataToSign = {'H', 'e', 'l', 'l', 'o', ' ',
-                                              'w', 'o', 'r', 'l', 'd', '!'};
+    const electronic_id::byte_vector authPin = {'1', '2', '3', '4'};
+    const electronic_id::byte_vector dataToSign = {'H', 'e', 'l', 'l', 'o', ' ',
+                                                   'w', 'o', 'r', 'l', 'd', '!'};
     const auto hash = calculateDigest(hashAlgo, dataToSign);
     const auto authSignature = cardInfo->eid().signWithAuthKey(authPin, hash);
     if (!verify(hashAlgo, certificateAuth, dataToSign, authSignature, false)) {
@@ -240,7 +240,7 @@ TEST(electronic_id_test, selectCertificateLatV2)
     EXPECT_EQ(signingRetriesLeft.first, 3u);
     EXPECT_EQ(signingRetriesLeft.second, 3);
 
-    const pcsc_cpp::byte_vector signPin = {'1', '2', '3', '4', '5', '6'};
+    const electronic_id::byte_vector signPin = {'1', '2', '3', '4', '5', '6'};
     EXPECT_EQ(cardInfo->eid().isSupportedSigningHashAlgorithm(hashAlgo), true);
     const auto signSignature = cardInfo->eid().signWithSigningKey(signPin, hash, hashAlgo);
     EXPECT_EQ(signSignature.second, SignatureAlgorithm::RS256);

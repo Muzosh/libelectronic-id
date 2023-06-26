@@ -34,9 +34,13 @@ namespace electronic_id
 // Use functions instead of global variables to avoid the "static initialization fiasco".
 const std::set<SignatureAlgorithm>& ELLIPTIC_CURVE_SIGNATURE_ALGOS();
 const std::set<SignatureAlgorithm>& RSA_SIGNATURE_ALGOS();
+const std::set<SignatureAlgorithm>& DILITHIUM_SIGNATURE_ALGOS();
+const std::set<SignatureAlgorithm>& FALCON_SIGNATURE_ALGOS();
+const std::set<SignatureAlgorithm>& SPHINCS_SIGNATURE_ALGOS();
 
 inline void validateAuthHashLength(const JsonWebSignatureAlgorithm authSignatureAlgorithm,
-                                   const std::string& eidName, const pcsc_cpp::byte_vector& hash)
+                                   const std::string& eidName,
+                                   const electronic_id::byte_vector& hash)
 {
     if (authSignatureAlgorithm.hashByteLength() != hash.size()) {
         THROW(SmartCardChangeRequiredError,
@@ -48,7 +52,7 @@ inline void validateAuthHashLength(const JsonWebSignatureAlgorithm authSignature
 }
 
 inline void validateSigningHash(const ElectronicID& eid, const HashAlgorithm hashAlgo,
-                                const pcsc_cpp::byte_vector& hash)
+                                const electronic_id::byte_vector& hash)
 {
     if (!eid.isSupportedSigningHashAlgorithm(hashAlgo)) {
         THROW(SmartCardChangeRequiredError,
@@ -64,10 +68,10 @@ inline void validateSigningHash(const ElectronicID& eid, const HashAlgorithm has
     }
 }
 
-inline pcsc_cpp::byte_vector addRSAOID(const HashAlgorithm hashAlgo,
-                                       const pcsc_cpp::byte_vector& hash)
+inline electronic_id::byte_vector addRSAOID(const HashAlgorithm hashAlgo,
+                                            const electronic_id::byte_vector& hash)
 {
-    pcsc_cpp::byte_vector oidAndHash = HashAlgorithm::rsaOID(hashAlgo);
+    electronic_id::byte_vector oidAndHash = HashAlgorithm::rsaOID(hashAlgo);
     oidAndHash.insert(oidAndHash.cend(), hash.cbegin(), hash.cend());
     return oidAndHash;
 }

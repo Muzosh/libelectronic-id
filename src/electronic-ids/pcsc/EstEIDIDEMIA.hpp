@@ -42,8 +42,8 @@ private:
     const std::set<SignatureAlgorithm>& supportedSigningAlgorithms() const override;
     SignatureAlgorithm signingSignatureAlgorithm() const override { return SignatureAlgorithm::ES; }
     PinMinMaxLength signingPinMinMaxLength() const override { return {5, 12}; }
-    Signature signWithSigningKeyImpl(const pcsc_cpp::byte_vector& pin,
-                                     const pcsc_cpp::byte_vector& hash,
+    Signature signWithSigningKeyImpl(const electronic_id::byte_vector& pin,
+                                     const electronic_id::byte_vector& hash,
                                      const HashAlgorithm hashAlgo) const override;
 
     std::string name() const override { return "EstEID IDEMIA v1"; }

@@ -114,7 +114,7 @@ std::string belgianPkcs11ModulePath()
 const std::map<electronic_id::Pkcs11ElectronicIDType, electronic_id::Pkcs11ElectronicIDModule>
     SUPPORTED_PKCS11_MODULES = {
         // EstEIDIDEMIAV1 configuration is here only for testing,
-        // it is not enabled in getElectronicID().
+        // it is not enabled in getCardElectronicID().
         {electronic_id::Pkcs11ElectronicIDType::EstEIDIDEMIAV1,
          {
              "EstEID IDEMIA v1 (PKCS#11)"s, // name
@@ -222,7 +222,7 @@ Pkcs11ElectronicID::Pkcs11ElectronicID(pcsc_cpp::SmartCard::ptr _card,
     }
 }
 
-pcsc_cpp::byte_vector Pkcs11ElectronicID::getCertificate(const CertificateType type) const
+electronic_id::byte_vector Pkcs11ElectronicID::getCertificate(const CertificateType type) const
 {
     return type.isAuthentication() ? authToken.cert : signingToken.cert;
 }
@@ -237,8 +237,9 @@ ElectronicID::PinRetriesRemainingAndMax Pkcs11ElectronicID::authPinRetriesLeft()
     return {authToken.retry, module.retryMax};
 }
 
-pcsc_cpp::byte_vector Pkcs11ElectronicID::signWithAuthKey(const pcsc_cpp::byte_vector& pin,
-                                                          const pcsc_cpp::byte_vector& hash) const
+electronic_id::byte_vector
+Pkcs11ElectronicID::signWithAuthKey(const electronic_id::byte_vector& pin,
+                                    const electronic_id::byte_vector& hash) const
 {
     try {
         validateAuthHashLength(authSignatureAlgorithm(), name(), hash);
@@ -253,7 +254,7 @@ pcsc_cpp::byte_vector Pkcs11ElectronicID::signWithAuthKey(const pcsc_cpp::byte_v
         // somewhat inelegant workaround caused by module.retryMax not being available inside
         // PKCS11CardManager. We should eventually consider improving this.
         if (e.status() == VerifyPinFailed::Status::RETRY_ALLOWED && module.retryMax == -1) {
-            throw VerifyPinFailed(VerifyPinFailed::Status::RETRY_ALLOWED, nullptr, -1);
+            throw VerifyPinFailed(VerifyPinFailed::Status::RETRY_ALLOWED, {}, -1);
         }
         throw;
     }
@@ -269,9 +270,10 @@ ElectronicID::PinRetriesRemainingAndMax Pkcs11ElectronicID::signingPinRetriesLef
     return {signingToken.retry, module.retryMax};
 }
 
-ElectronicID::Signature Pkcs11ElectronicID::signWithSigningKey(const pcsc_cpp::byte_vector& pin,
-                                                               const pcsc_cpp::byte_vector& hash,
-                                                               const HashAlgorithm hashAlgo) const
+ElectronicID::Signature
+Pkcs11ElectronicID::signWithSigningKey(const electronic_id::byte_vector& pin,
+                                       const electronic_id::byte_vector& hash,
+                                       const HashAlgorithm hashAlgo) const
 {
     try {
         validateSigningHash(*this, hashAlgo, hash);
@@ -290,7 +292,7 @@ ElectronicID::Signature Pkcs11ElectronicID::signWithSigningKey(const pcsc_cpp::b
     } catch (const VerifyPinFailed& e) {
         // Same issue as in signWithAuthKey().
         if (e.status() == VerifyPinFailed::Status::RETRY_ALLOWED && module.retryMax == -1) {
-            throw VerifyPinFailed(VerifyPinFailed::Status::RETRY_ALLOWED, nullptr, -1);
+            throw VerifyPinFailed(VerifyPinFailed::Status::RETRY_ALLOWED, {}, -1);
         }
         throw;
     }

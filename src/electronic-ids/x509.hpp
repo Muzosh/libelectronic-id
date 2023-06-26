@@ -26,7 +26,7 @@ inline bool hasClientAuthExtendedKeyUsage(EXTENDED_KEY_USAGE* usage)
     return false;
 }
 
-inline CertificateType certificateType(const pcsc_cpp::byte_vector& cert)
+inline CertificateType certificateType(const electronic_id::byte_vector& cert)
 {
     const unsigned char* certPtr = cert.data();
     auto x509 = SCOPE_GUARD(X509, d2i_X509(nullptr, &certPtr, long(cert.size())));

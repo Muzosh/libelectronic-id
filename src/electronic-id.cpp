@@ -25,9 +25,12 @@
 #include "electronic-ids/pcsc/FinEID.hpp"
 #include "electronic-ids/pcsc/LatEIDIDEMIAv1.hpp"
 #include "electronic-ids/pcsc/LatEIDIDEMIAv2.hpp"
+#include "electronic-ids/serial/InfinitEIDPQ.hpp"
 
 #include "electronic-ids/pkcs11/Pkcs11ElectronicID.hpp"
+#include "electronic-ids/serial/SerialElectronicID.hpp"
 
+#include "serial-cpp/serial-cpp-utils.hpp"
 #include "pcsc-cpp/pcsc-cpp-utils.hpp"
 
 #include "magic_enum/magic_enum.hpp"
@@ -40,21 +43,25 @@
 #include <sstream>
 #include <string>
 #include <utility>
+#include <list>
+
+#include <QtSerialPort/qserialportinfo.h>
 
 using namespace pcsc_cpp;
+using namespace serial_cpp;
 using namespace electronic_id;
 using namespace std::string_literals;
 
 namespace
 {
 
-using ElectronicIDConstructor = std::function<ElectronicID::ptr(SmartCard::ptr&&)>;
+using ElectronicIDCardConstructor = std::function<ElectronicID::ptr(SmartCard::ptr&&)>;
 
 #define ESTEID_GEMALTO_V3_5_8_CONSTUCTOR                                                           \
     [](SmartCard::ptr&& card) { return std::make_unique<EstEIDGemaltoV3_5_8>(std::move(card)); }
 
 // Supported cards.
-const std::map<byte_vector, ElectronicIDConstructor> SUPPORTED_ATRS = {
+const std::map<byte_vector, ElectronicIDCardConstructor> SUPPORTED_ATRS = {
     // EstEID Gemalto v3.5.8 cold
     {{0x3b, 0xfa, 0x18, 0x00, 0x00, 0x80, 0x31, 0xfe, 0x45, 0xfe,
       0x65, 0x49, 0x44, 0x20, 0x2f, 0x20, 0x50, 0x4b, 0x49, 0x03},
@@ -118,6 +125,16 @@ const std::map<byte_vector, ElectronicIDConstructor> SUPPORTED_ATRS = {
      }},
 };
 
+using ElectronicIDSerialDeviceConstructor = std::function<ElectronicID::ptr(SerialDevice::ptr&&)>;
+
+// Supported serial devices
+const std::map<byte_vector, ElectronicIDSerialDeviceConstructor> SUPPORTED_SIDS = {
+    // InfinitEIDPQ ESP32
+    {{0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x10},
+     [](SerialDevice::ptr&& serialDevice) {
+         return std::make_unique<InfinitEIDPQ>(std::move(serialDevice));
+     }}};
+
 inline std::string byteVectorToHexString(const byte_vector& bytes)
 {
     std::ostringstream hexStringBuilder;
@@ -143,21 +160,98 @@ const auto SUPPORTED_ALGORITHMS = std::map<std::string, HashAlgorithm> {
 namespace electronic_id
 {
 
-bool isCardSupported(const pcsc_cpp::byte_vector& atr)
+/*
+This container is required since we need to track already opened serial device ports, that can't be
+opened twice. Otherwise, the next iteration of EidContainerEventMonitorThread would report no serial
+device available and throw an exception in the middle of user interaction.
+ */
+std::list<SerialDeviceInfo::ptr> serialDeviceInfosOpenedByWebEid;
+
+std::vector<EidContainerInfo::ptr> availableSupportedEidContainers()
+{
+    // Prepare pointers for exceptions as we don't want to throw them immediately
+    // (there might be no cards, but we want to check for serial devices before throwing
+    // AutoSelectFailed exception)
+    std::unique_ptr<AutoSelectFailed> cardSelectionFailedEx;
+    std::unique_ptr<AutoSelectFailed> serialDeviceSelectionFailedEx;
+
+    // Prepare vectors for available cards and serial devices
+    std::vector<CardInfo::ptr> availableCardInfos;
+    std::vector<SerialDeviceInfo::ptr> availableSerialDeviceInfos;
+
+    // Get available cards
+    try {
+        availableCardInfos = electronic_id::availableSupportedCards();
+    } catch (AutoSelectFailed e) {
+        cardSelectionFailedEx = std::make_unique<AutoSelectFailed>(std::move(e));
+    }
+
+    // Get available serial devices
+    try {
+        availableSerialDeviceInfos = electronic_id::availableSupportedSerialDevices();
+    } catch (AutoSelectFailed e) {
+        serialDeviceSelectionFailedEx = std::make_unique<AutoSelectFailed>(std::move(e));
+    }
+
+    // If both card and serial device selection failed, then we can throw exception
+    if (cardSelectionFailedEx && serialDeviceSelectionFailedEx) {
+        // TODO: Currently throws only exception from card selection as I feel like it has still
+        // priority (Web-eID is mainly software for cards). Maybe use some generalized
+        // exception?
+        throw std::move(*cardSelectionFailedEx);
+    }
+
+    // Vector for all available eid containers (cards and serial devices) to return
+    std::vector<electronic_id::EidContainerInfo::ptr> availableEidContainers;
+    availableEidContainers.reserve(availableCardInfos.size() + availableSerialDeviceInfos.size());
+
+    // Fill available eid containers vector with available cards
+    for (const CardInfo::ptr& cardInfo : availableCardInfos) {
+        availableEidContainers.push_back(cardInfo);
+    }
+    // Fill available eid containers vector with available serial devices
+    for (const SerialDeviceInfo::ptr& serialDeviceInfo : availableSerialDeviceInfos) {
+        availableEidContainers.push_back(serialDeviceInfo);
+    }
+
+    return availableEidContainers;
+}
+
+bool isCardSupported(const electronic_id::byte_vector& atr)
 {
     return SUPPORTED_ATRS.count(atr);
 }
 
-ElectronicID::ptr getElectronicID(const pcsc_cpp::Reader& reader)
+bool isSerialDeviceSupported(const electronic_id::byte_vector& sid)
+{
+    return SUPPORTED_SIDS.count(sid);
+}
+
+ElectronicID::ptr getCardElectronicID(const pcsc_cpp::Reader& reader)
 {
     try {
         const auto& eidConstructor = SUPPORTED_ATRS.at(reader.cardAtr);
         return eidConstructor(reader.connectToCard());
     } catch (const std::out_of_range&) {
         // It should be verified that the card is supported with isCardSupported() before
-        // calling getElectronicID(), so it is a programming error if out_of_range occurs here.
+        // calling getCardElectronicID(), so it is a programming error if out_of_range occurs here.
         THROW(ProgrammingError,
               "Card with ATR '" + byteVectorToHexString(reader.cardAtr) + "' is not supported");
+    }
+}
+
+ElectronicID::ptr getSerialDeviceElectronicID(const serial_cpp::SerialPortHandler& serialPort)
+{
+    try {
+        const auto& eidConstructor = SUPPORTED_SIDS.at(serialPort.serialID);
+        return eidConstructor(serialPort.connectToSerialDevice());
+    } catch (const std::out_of_range&) {
+        // It should be verified that the serialDevice is supported with isSerialDeviceSupported()
+        // before calling getSerialDeviceElectronicID(), so it is a programming error if
+        // out_of_range occurs here.
+        SERIAL_CPP_THROW(ProgrammingError,
+                         "Device with SID '" + byteVectorToHexString(serialPort.serialID)
+                             + "' is not supported");
     }
 }
 
@@ -174,10 +268,9 @@ AutoSelectFailed::AutoSelectFailed(Reason r) :
 {
 }
 
-VerifyPinFailed::VerifyPinFailed(const Status s, const observer_ptr<pcsc_cpp::ResponseApdu> ra,
-                                 const int8_t r) :
+VerifyPinFailed::VerifyPinFailed(const Status s, const byte_vector responseBytes, const int8_t r) :
     Error(std::string("Verify PIN failed, status: ") + std::string(magic_enum::enum_name(s))
-          + (ra ? ", response: " + pcsc_cpp::bytes2hexstr(ra->toBytes()) : "")),
+          + (responseBytes.empty() ? ", response: " + pcsc_cpp::bytes2hexstr(responseBytes) : "")),
     _status(s), _retries(r)
 {
 }
@@ -212,7 +305,7 @@ std::string HashAlgorithm::allSupportedAlgorithmNames()
     return SUPPORTED_ALGORITHM_NAMES;
 }
 
-pcsc_cpp::byte_vector HashAlgorithm::rsaOID(const HashAlgorithmEnum hash)
+electronic_id::byte_vector HashAlgorithm::rsaOID(const HashAlgorithmEnum hash)
 {
     switch (hash) {
     case HashAlgorithm::SHA224:

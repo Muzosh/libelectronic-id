@@ -45,4 +45,33 @@ const std::set<SignatureAlgorithm>& RSA_SIGNATURE_ALGOS()
     return RS_ALGOS;
 }
 
+const std::set<SignatureAlgorithm>& DILITHIUM_SIGNATURE_ALGOS()
+{
+    const static std::set<SignatureAlgorithm> DILITHIUM_ALGOS = {
+        SignatureAlgorithm::DILITHIUM2,
+        SignatureAlgorithm::DILITHIUM3,
+        SignatureAlgorithm::DILITHIUM5,
+    };
+    return DILITHIUM_ALGOS;
+}
+
+const std::set<SignatureAlgorithm>& FALCON_SIGNATURE_ALGOS()
+{
+    const static std::set<SignatureAlgorithm> FALCON_ALGOS = {
+        SignatureAlgorithm::FALCON512,
+        SignatureAlgorithm::FALCON1024,
+    };
+    return FALCON_ALGOS;
+}
+
+const std::set<SignatureAlgorithm>& SPHINCS_SIGNATURE_ALGOS()
+{
+    const static std::set<SignatureAlgorithm> SPHINCS_ALGOS = {
+        SignatureAlgorithm::SPHINCS128f, SignatureAlgorithm::SPHINCS128s,
+        SignatureAlgorithm::SPHINCS192f, SignatureAlgorithm::SPHINCS192s,
+        SignatureAlgorithm::SPHINCS256f, SignatureAlgorithm::SPHINCS256s,
+    };
+    return SPHINCS_ALGOS;
+}
+
 } // namespace electronic_id

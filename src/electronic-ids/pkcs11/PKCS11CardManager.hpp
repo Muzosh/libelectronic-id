@@ -183,7 +183,7 @@ public:
             try {
                 CK_TOKEN_INFO tokenInfo;
                 C(GetTokenInfo, token.slotID, &tokenInfo);
-                throw VerifyPinFailed(VerifyPinFailed::Status::RETRY_ALLOWED, nullptr,
+                throw VerifyPinFailed(VerifyPinFailed::Status::RETRY_ALLOWED, {},
                                       pinRetryCount(tokenInfo.flags));
             } catch (const Pkcs11Error&) {
                 throw e;

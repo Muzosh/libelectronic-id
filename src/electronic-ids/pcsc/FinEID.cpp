@@ -140,28 +140,28 @@ byte_vector FinEIDv3::sign(const HashAlgorithm hashAlgo, const byte_vector& hash
     auto tlv = byte_vector {0x90, byte_vector::value_type(hash.size())};
     tlv.insert(tlv.cend(), hash.cbegin(), hash.cend());
 
-    const auto computeSignature = CommandApdu {{0x00, 0x2A, 0x90, 0xA0}, tlv};
+    const auto computeSignature = CardCommandApdu {{0x00, 0x2A, 0x90, 0xA0}, tlv};
     const auto response = card->transmit(computeSignature);
 
-    if (response.sw1 == ResponseApdu::WRONG_LENGTH) {
+    if (response.sw1 == CardResponseApdu::WRONG_LENGTH) {
         THROW(SmartCardError,
               "Wrong data length in command COMPUTE SIGNATURE argument: "
                   + bytes2hexstr(response.toBytes()));
     }
-    if (response.sw1 != ResponseApdu::OK) {
+    if (response.sw1 != CardResponseApdu::OK) {
         THROW(SmartCardError,
               "Command COMPUTE SIGNATURE failed with error " + bytes2hexstr(response.toBytes()));
     }
 
-    const auto getSignature = CommandApdu {0x00, 0x2A, 0x9E, 0x9A, {}, LE};
+    const auto getSignature = CardCommandApdu {0x00, 0x2A, 0x9E, 0x9A, {}, LE};
     const auto signature = card->transmit(getSignature);
 
-    if (signature.sw1 == ResponseApdu::WRONG_LENGTH) {
+    if (signature.sw1 == CardResponseApdu::WRONG_LENGTH) {
         THROW(SmartCardError,
               "Wrong data length in command GET SIGNATURE argument: "
                   + bytes2hexstr(response.toBytes()));
     }
-    if (signature.sw1 != ResponseApdu::OK) {
+    if (signature.sw1 != CardResponseApdu::OK) {
         THROW(SmartCardError,
               "Command GET SIGNATURE failed with error " + bytes2hexstr(response.toBytes()));
     }
@@ -172,7 +172,7 @@ byte_vector FinEIDv3::sign(const HashAlgorithm hashAlgo, const byte_vector& hash
 ElectronicID::PinRetriesRemainingAndMax
 FinEIDv3::pinRetriesLeft(byte_vector::value_type pinReference) const
 {
-    const pcsc_cpp::CommandApdu GET_DATA {
+    const pcsc_cpp::CardCommandApdu GET_DATA {
         0x00, 0xCB, 0x00, 0xFF, {0xA0, 0x03, 0x83, 0x01, pinReference}};
     const auto response = card->transmit(GET_DATA);
     if (!response.isOK()) {

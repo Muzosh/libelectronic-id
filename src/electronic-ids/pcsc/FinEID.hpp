@@ -33,7 +33,7 @@ public:
     FinEIDv3(pcsc_cpp::SmartCard::ptr _card) : PcscElectronicID(std::move(_card)) {}
 
 private:
-    pcsc_cpp::byte_vector getCertificateImpl(const CertificateType type) const override;
+    electronic_id::byte_vector getCertificateImpl(const CertificateType type) const override;
 
     JsonWebSignatureAlgorithm authSignatureAlgorithm() const override
     {
@@ -49,22 +49,23 @@ private:
     std::string name() const override { return "FinEID v3"; }
     Type type() const override { return FinEID; }
 
-    pcsc_cpp::byte_vector signWithAuthKeyImpl(const pcsc_cpp::byte_vector& pin,
-                                              const pcsc_cpp::byte_vector& hash) const override;
+    electronic_id::byte_vector
+    signWithAuthKeyImpl(const electronic_id::byte_vector& pin,
+                        const electronic_id::byte_vector& hash) const override;
 
-    Signature signWithSigningKeyImpl(const pcsc_cpp::byte_vector& pin,
-                                     const pcsc_cpp::byte_vector& hash,
+    Signature signWithSigningKeyImpl(const electronic_id::byte_vector& pin,
+                                     const electronic_id::byte_vector& hash,
                                      const HashAlgorithm hashAlgo) const override;
 
-    pcsc_cpp::byte_vector sign(const HashAlgorithm hashAlgo, const pcsc_cpp::byte_vector& hash,
-                               const pcsc_cpp::byte_vector& pin,
-                               pcsc_cpp::byte_vector::value_type pinReference,
-                               PinMinMaxLength pinMinMaxLength,
-                               pcsc_cpp::byte_vector::value_type keyReference,
-                               pcsc_cpp::byte_vector::value_type signatureAlgo,
-                               pcsc_cpp::byte_vector::value_type LE) const;
+    electronic_id::byte_vector
+    sign(const HashAlgorithm hashAlgo, const electronic_id::byte_vector& hash,
+         const electronic_id::byte_vector& pin, electronic_id::byte_vector::value_type pinReference,
+         PinMinMaxLength pinMinMaxLength, electronic_id::byte_vector::value_type keyReference,
+         electronic_id::byte_vector::value_type signatureAlgo,
+         electronic_id::byte_vector::value_type LE) const;
 
-    PinRetriesRemainingAndMax pinRetriesLeft(pcsc_cpp::byte_vector::value_type pinReference) const;
+    PinRetriesRemainingAndMax
+    pinRetriesLeft(electronic_id::byte_vector::value_type pinReference) const;
 };
 
 } // namespace electronic_id

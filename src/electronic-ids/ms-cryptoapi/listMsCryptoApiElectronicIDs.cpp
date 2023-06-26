@@ -56,8 +56,8 @@ std::vector<CardInfo::ptr> listMsCryptoApiElectronicIDs()
 
     PCCERT_CONTEXT cert = nullptr;
     while ((cert = CertEnumCertificatesInStore(sys, cert)) != nullptr) {
-        pcsc_cpp::byte_vector certData(cert->pbCertEncoded,
-                                       cert->pbCertEncoded + cert->cbCertEncoded);
+        electronic_id::byte_vector certData(cert->pbCertEncoded,
+                                            cert->pbCertEncoded + cert->cbCertEncoded);
 
         CertificateType certType {CertificateType::NONE};
         try {

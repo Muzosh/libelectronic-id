@@ -46,9 +46,10 @@ const std::set<SignatureAlgorithm>& EstEIDIDEMIAV1::supportedSigningAlgorithms()
     return ELLIPTIC_CURVE_SIGNATURE_ALGOS();
 }
 
-ElectronicID::Signature EstEIDIDEMIAV1::signWithSigningKeyImpl(const pcsc_cpp::byte_vector& pin,
-                                                               const pcsc_cpp::byte_vector& hash,
-                                                               const HashAlgorithm hashAlgo) const
+ElectronicID::Signature
+EstEIDIDEMIAV1::signWithSigningKeyImpl(const electronic_id::byte_vector& pin,
+                                       const electronic_id::byte_vector& hash,
+                                       const HashAlgorithm hashAlgo) const
 {
     static const size_t ECDSA384_INPUT_LENGTH = 384 / 8;
     auto tmp = hash;

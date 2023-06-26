@@ -22,8 +22,6 @@
 
 #pragma once
 
-#include "pcsc-cpp/pcsc-cpp.hpp"
-
 #include <set>
 #include <string>
 
@@ -96,7 +94,7 @@ public:
     constexpr bool isSHA2orSHA3() const { return isSHA2() || isSHA3(); }
 
     static std::string allSupportedAlgorithmNames();
-    static pcsc_cpp::byte_vector rsaOID(const HashAlgorithmEnum hash);
+    static std::vector<unsigned char> rsaOID(const HashAlgorithmEnum hash);
 
 private:
     HashAlgorithmEnum value = NONE;
@@ -107,6 +105,23 @@ class SignatureAlgorithm
 {
 public:
     enum SignatureAlgorithmEnum {
+        // DILITHIUM
+        DILITHIUM = 1 << 10,
+        DILITHIUM2 = DILITHIUM | 2 | HashAlgorithm::SHA512,
+        DILITHIUM3 = DILITHIUM | 3 | HashAlgorithm::SHA512,
+        DILITHIUM5 = DILITHIUM | 5 | HashAlgorithm::SHA512,
+        // FALCON -- not supported right now
+        FALCON = 1 << 11,
+        FALCON512 = FALCON | 512 | HashAlgorithm::SHA512,
+        FALCON1024 = FALCON | 1024 | HashAlgorithm::SHA512,
+        // SPHINCS -- not supported right now
+        SPHINCS = 1 << 12,
+        SPHINCS128s = SPHINCS | 128 | 115 | HashAlgorithm::SHA512,
+        SPHINCS128f = SPHINCS | 128 | 102 | HashAlgorithm::SHA512,
+        SPHINCS192s = SPHINCS | 192 | 115 | HashAlgorithm::SHA512,
+        SPHINCS192f = SPHINCS | 192 | 102 | HashAlgorithm::SHA512,
+        SPHINCS256s = SPHINCS | 256 | 115 | HashAlgorithm::SHA512,
+        SPHINCS256f = SPHINCS | 256 | 102 | HashAlgorithm::SHA512,
         // ECDSA
         ES = 1 << 13,
         ES224 = ES | HashAlgorithm::SHA224,
@@ -184,6 +199,17 @@ public:
         RS256, // RSASSA-PKCS1-v1_5
         RS384,
         RS512,
+        CRYDI2, // CRYSTALS-Dilithium
+        CRYDI3,
+        CRYDI5,
+        FALCON512, // FALCON
+        FALCON1024,
+        SPHINCS128s, // SPHINCS
+        SPHINCS128f,
+        SPHINCS192s,
+        SPHINCS192f,
+        SPHINCS256s,
+        SPHINCS256f,
         NONE = -1
     };
 
@@ -211,6 +237,17 @@ public:
         case ES512:
         case PS512:
         case RS512:
+        case CRYDI2:
+        case CRYDI3:
+        case CRYDI5:
+        case FALCON512:
+        case FALCON1024:
+        case SPHINCS128s:
+        case SPHINCS128f:
+        case SPHINCS192s:
+        case SPHINCS192f:
+        case SPHINCS256s:
+        case SPHINCS256f:
             return HashAlgorithm::SHA512;
         default:
             throw std::logic_error("JsonWebSignatureAlgorithm::hashAlgorithm(): Invalid value "

@@ -1,3 +1,7 @@
 [submodule "lib/libpcsc-cpp"]
 	path = lib/libpcsc-cpp
-	url = ../libpcsc-cpp
+	url = https://github.com/Muzosh/libpcsc-cpp.git
+	branch = feature-adapt-serial-abstraction-layer
+[submodule "lib/libserial-cpp"]
+	path = lib/libserial-cpp
+	url = https://github.com/Muzosh/libserial-cpp

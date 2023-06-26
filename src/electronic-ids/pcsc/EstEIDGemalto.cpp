@@ -99,8 +99,8 @@ ElectronicID::PinRetriesRemainingAndMax EstEIDGemaltoV3_5_8::signingPinRetriesLe
 ElectronicID::PinRetriesRemainingAndMax
 EstEIDGemaltoV3_5_8::pinRetriesLeft(byte_vector::value_type pinReference) const
 {
-    static const CommandApdu PINRETRY {0x00, 0xA4, 0x02, 0x0C, {0x00, 0x16}};
-    const CommandApdu READRECORD {0x00, 0xB2, pinReference, 0x04};
+    static const CardCommandApdu PINRETRY {0x00, 0xA4, 0x02, 0x0C, {0x00, 0x16}};
+    const CardCommandApdu READRECORD {0x00, 0xB2, pinReference, 0x04};
     transmitApduWithExpectedResponse(*card, MASTER_FILE);
     transmitApduWithExpectedResponse(*card, PINRETRY);
     const auto response = card->transmit(READRECORD);

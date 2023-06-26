@@ -29,15 +29,19 @@
 namespace electronic_id
 {
 
-class PcscElectronicID : public ElectronicID
+class SerialElectronicID : public ElectronicID
 {
 public:
-    PcscElectronicID(pcsc_cpp::SmartCard::ptr _card) : ElectronicID(std::move(_card)) {}
+    SerialElectronicID(serial_cpp::SerialDevice::ptr _serialDevice) :
+        ElectronicID(std::move(_serialDevice))
+    {
+        // Setup custom serial device options here in derived classes
+        // Example: serialDevice().setup(serial_cpp::defaultSerialOptions);
+    }
 
 protected:
     electronic_id::byte_vector getCertificate(const CertificateType type) const override
     {
-        auto transactionGuard = card->beginTransaction();
         return getCertificateImpl(type);
     }
 
@@ -47,7 +51,6 @@ protected:
     {
         validateAuthHashLength(authSignatureAlgorithm(), name(), hash);
 
-        auto transactionGuard = card->beginTransaction();
         return signWithAuthKeyImpl(pin, hash);
     }
 
@@ -57,19 +60,16 @@ protected:
     {
         validateSigningHash(*this, hashAlgo, hash);
 
-        auto transactionGuard = card->beginTransaction();
         return signWithSigningKeyImpl(pin, hash, hashAlgo);
     }
 
     PinRetriesRemainingAndMax signingPinRetriesLeft() const override
     {
-        auto transactionGuard = card->beginTransaction();
         return signingPinRetriesLeftImpl();
     }
 
     ElectronicID::PinRetriesRemainingAndMax authPinRetriesLeft() const override
     {
-        auto transactionGuard = card->beginTransaction();
         return authPinRetriesLeftImpl();
     }
 

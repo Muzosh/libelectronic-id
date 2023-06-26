@@ -43,7 +43,7 @@ inline int ECDSA_SIG_set0(ECDSA_SIG* sig, BIGNUM* r, BIGNUM* s)
 }
 #endif
 
-inline pcsc_cpp::byte_vector ECconcatToASN1(const pcsc_cpp::byte_vector& data)
+inline electronic_id::byte_vector ECconcatToASN1(const electronic_id::byte_vector& data)
 {
     auto ecdsa = SCOPE_GUARD(ECDSA_SIG, ECDSA_SIG_new());
     if (ECDSA_SIG_set0(ecdsa.get(), BN_bin2bn(data.data(), int(data.size() / 2), nullptr),
@@ -55,7 +55,7 @@ inline pcsc_cpp::byte_vector ECconcatToASN1(const pcsc_cpp::byte_vector& data)
     if (size < 1) {
         throw std::runtime_error("ECconcatToASN1: i2d_ECDSA_SIG() failed");
     }
-    pcsc_cpp::byte_vector result(size);
+    electronic_id::byte_vector result(size);
     unsigned char* p = result.data();
     if (i2d_ECDSA_SIG(ecdsa.get(), &p) != size) {
         throw std::runtime_error(
@@ -90,10 +90,10 @@ inline const EVP_MD* hashToMD(electronic_id::HashAlgorithm hashAlgo)
     }
 }
 
-inline pcsc_cpp::byte_vector calculateDigest(electronic_id::HashAlgorithm hashAlgo,
-                                             const pcsc_cpp::byte_vector& data)
+inline electronic_id::byte_vector calculateDigest(electronic_id::HashAlgorithm hashAlgo,
+                                                  const electronic_id::byte_vector& data)
 {
-    pcsc_cpp::byte_vector digest(size_t(EVP_MAX_MD_SIZE));
+    electronic_id::byte_vector digest(size_t(EVP_MAX_MD_SIZE));
     const EVP_MD* md = hashToMD(hashAlgo);
     unsigned int size = 0;
     if (EVP_Digest(data.data(), data.size(), digest.data(), &size, md, nullptr) != 1) {
@@ -103,9 +103,9 @@ inline pcsc_cpp::byte_vector calculateDigest(electronic_id::HashAlgorithm hashAl
     return digest;
 }
 
-inline bool verify(electronic_id::HashAlgorithm hashAlgo, const pcsc_cpp::byte_vector& der,
-                   const pcsc_cpp::byte_vector& data, const pcsc_cpp::byte_vector& signature,
-                   bool isPSS)
+inline bool verify(electronic_id::HashAlgorithm hashAlgo, const electronic_id::byte_vector& der,
+                   const electronic_id::byte_vector& data,
+                   const electronic_id::byte_vector& signature, bool isPSS)
 {
     if (der.empty() || data.empty() || signature.empty()) {
         throw std::logic_error("verify: empty der, data or signature");
@@ -119,7 +119,7 @@ inline bool verify(electronic_id::HashAlgorithm hashAlgo, const pcsc_cpp::byte_v
     if (!key) {
         throw std::runtime_error("verify: X509 public key object creation failed");
     }
-    pcsc_cpp::byte_vector sig =
+    electronic_id::byte_vector sig =
         EVP_PKEY_base_id(key.get()) == EVP_PKEY_EC ? ECconcatToASN1(signature) : signature;
     auto ctx = SCOPE_GUARD(EVP_MD_CTX, EVP_MD_CTX_new());
     EVP_PKEY_CTX* pkctx = nullptr;

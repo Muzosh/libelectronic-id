@@ -4,7 +4,8 @@
 
 #include <stdexcept>
 
-inline electronic_id::CardInfo::ptr autoSelectSupportedCard() {
+inline electronic_id::CardInfo::ptr autoSelectSupportedCard()
+{
     using namespace electronic_id;
 
     auto cardList = availableSupportedCards();
@@ -12,5 +13,5 @@ inline electronic_id::CardInfo::ptr autoSelectSupportedCard() {
         throw std::logic_error("test::autoSelectSupportedCard(): No smart cards attached");
     }
 
-    return  cardList[0];
+    return cardList[0];
 }

@@ -29,21 +29,21 @@ namespace electronic_id
 
 struct SelectApplicationIDCmds
 {
-    const pcsc_cpp::byte_vector MAIN_AID;
-    const pcsc_cpp::byte_vector AUTH_AID;
-    const pcsc_cpp::byte_vector SIGN_AID;
+    const electronic_id::byte_vector MAIN_AID;
+    const electronic_id::byte_vector AUTH_AID;
+    const electronic_id::byte_vector SIGN_AID;
 };
 
 struct SelectCertificateCmds
 {
-    const pcsc_cpp::byte_vector AUTH_CERT;
-    const pcsc_cpp::byte_vector SIGN_CERT;
+    const electronic_id::byte_vector AUTH_CERT;
+    const electronic_id::byte_vector SIGN_CERT;
 };
 
 struct ManageSecurityEnvCmds
 {
-    const pcsc_cpp::byte_vector AUTH_ENV;
-    const pcsc_cpp::byte_vector SIGN_ENV;
+    const electronic_id::byte_vector AUTH_ENV;
+    const electronic_id::byte_vector SIGN_ENV;
 };
 
 class EIDIDEMIA : public PcscElectronicID
@@ -52,15 +52,16 @@ public:
     EIDIDEMIA(pcsc_cpp::SmartCard::ptr _card) : PcscElectronicID(std::move(_card)) {}
 
 protected:
-    pcsc_cpp::byte_vector getCertificateImpl(const CertificateType type) const override;
+    electronic_id::byte_vector getCertificateImpl(const CertificateType type) const override;
 
     PinRetriesRemainingAndMax authPinRetriesLeftImpl() const override;
-    pcsc_cpp::byte_vector signWithAuthKeyImpl(const pcsc_cpp::byte_vector& pin,
-                                              const pcsc_cpp::byte_vector& hash) const override;
+    electronic_id::byte_vector
+    signWithAuthKeyImpl(const electronic_id::byte_vector& pin,
+                        const electronic_id::byte_vector& hash) const override;
 
     PinRetriesRemainingAndMax signingPinRetriesLeftImpl() const override;
-    Signature signWithSigningKeyImpl(const pcsc_cpp::byte_vector& pin,
-                                     const pcsc_cpp::byte_vector& hash,
+    Signature signWithSigningKeyImpl(const electronic_id::byte_vector& pin,
+                                     const electronic_id::byte_vector& hash,
                                      const HashAlgorithm hashAlgo) const override;
 
     virtual const SelectApplicationIDCmds& selectApplicationID() const;
@@ -68,9 +69,10 @@ protected:
     virtual const ManageSecurityEnvCmds& selectSecurityEnv() const = 0;
 
     virtual size_t pinBlockLength() const { return authPinMinMaxLength().second; }
-    virtual pcsc_cpp::byte_vector::value_type signingPinReference() const { return 0x85; }
+    virtual electronic_id::byte_vector::value_type signingPinReference() const { return 0x85; }
     virtual SignatureAlgorithm signingSignatureAlgorithm() const = 0;
-    PinRetriesRemainingAndMax pinRetriesLeft(pcsc_cpp::byte_vector::value_type pinReference) const;
+    PinRetriesRemainingAndMax
+    pinRetriesLeft(electronic_id::byte_vector::value_type pinReference) const;
 
     virtual bool useInternalAuthenticateAndRSAWithPKCS1PaddingDuringSigning() const
     {

@@ -61,7 +61,7 @@ private:
         return module.allowsUsingLettersAndSpecialCharactersInPin;
     }
 
-    pcsc_cpp::byte_vector getCertificate(const CertificateType type) const override;
+    electronic_id::byte_vector getCertificate(const CertificateType type) const override;
 
     JsonWebSignatureAlgorithm authSignatureAlgorithm() const override
     {
@@ -70,8 +70,9 @@ private:
     PinMinMaxLength authPinMinMaxLength() const override;
 
     PinRetriesRemainingAndMax authPinRetriesLeft() const override;
-    pcsc_cpp::byte_vector signWithAuthKey(const pcsc_cpp::byte_vector& pin,
-                                          const pcsc_cpp::byte_vector& hash) const override;
+    electronic_id::byte_vector
+    signWithAuthKey(const electronic_id::byte_vector& pin,
+                    const electronic_id::byte_vector& hash) const override;
 
     const std::set<SignatureAlgorithm>& supportedSigningAlgorithms() const override
     {
@@ -80,8 +81,8 @@ private:
     PinMinMaxLength signingPinMinMaxLength() const override;
 
     PinRetriesRemainingAndMax signingPinRetriesLeft() const override;
-    Signature signWithSigningKey(const pcsc_cpp::byte_vector& pin,
-                                 const pcsc_cpp::byte_vector& hash,
+    Signature signWithSigningKey(const electronic_id::byte_vector& pin,
+                                 const electronic_id::byte_vector& hash,
                                  const HashAlgorithm hashAlgo) const override;
 
     std::string name() const override { return module.name; }

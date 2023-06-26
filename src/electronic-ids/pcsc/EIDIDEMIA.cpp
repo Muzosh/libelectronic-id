@@ -123,14 +123,14 @@ const SelectCertificateCmds& EIDIDEMIA::selectCertificate() const
 ElectronicID::PinRetriesRemainingAndMax
 EIDIDEMIA::pinRetriesLeft(byte_vector::value_type pinReference) const
 {
-    const pcsc_cpp::CommandApdu GET_DATA_ODD {0x00,
-                                              0xCB,
-                                              0x3F,
-                                              0xFF,
-                                              {0x4D, 0x08, 0x70, 0x06, 0xBF, 0x81,
-                                               byte_vector::value_type(pinReference & 0x0F), 0x02,
-                                               0xA0, 0x80},
-                                              0x00};
+    const pcsc_cpp::CardCommandApdu GET_DATA_ODD {0x00,
+                                                  0xCB,
+                                                  0x3F,
+                                                  0xFF,
+                                                  {0x4D, 0x08, 0x70, 0x06, 0xBF, 0x81,
+                                                   byte_vector::value_type(pinReference & 0x0F),
+                                                   0x02, 0xA0, 0x80},
+                                                  0x00};
     const auto response = card->transmit(GET_DATA_ODD);
     if (!response.isOK()) {
         THROW(SmartCardError,

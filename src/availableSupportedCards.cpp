@@ -31,10 +31,10 @@ namespace
 
 using namespace electronic_id;
 
-inline CardInfo::ptr connectToCard(const pcsc_cpp::Reader& reader)
+inline CardInfo::ptr getCardInfo(const pcsc_cpp::Reader& reader)
 {
-    auto eid = getElectronicID(reader);
-    return std::make_shared<CardInfo>(reader, eid);
+    auto eid = getCardElectronicID(reader);
+    return std::make_shared<CardInfo>(eid, reader);
 }
 
 } // namespace
@@ -58,7 +58,7 @@ std::vector<CardInfo::ptr> availableSupportedCards()
             }
             seenCard = true;
             if (isCardSupported(reader.cardAtr)) {
-                cards.push_back(connectToCard(reader));
+                cards.push_back(getCardInfo(reader));
             }
         }
 
@@ -89,15 +89,15 @@ std::vector<CardInfo::ptr> availableSupportedCards()
 
         return cards;
 
-    } catch (const pcsc_cpp::ScardServiceNotRunningError&) {
+    } catch (const pcsc_cpp::SCardServiceNotRunningError&) {
         throw AutoSelectFailed(AutoSelectFailed::Reason::SERVICE_NOT_RUNNING);
-    } catch (const pcsc_cpp::ScardNoReadersError&) {
+    } catch (const pcsc_cpp::SCardNoReadersError&) {
         throw AutoSelectFailed(AutoSelectFailed::Reason::NO_READERS);
-    } catch (const pcsc_cpp::ScardNoCardError&) {
+    } catch (const pcsc_cpp::SCardNoCardError&) {
         throw AutoSelectFailed(readers.size() > 1
                                    ? AutoSelectFailed::Reason::MULTIPLE_READERS_NO_CARD
                                    : AutoSelectFailed::Reason::SINGLE_READER_NO_CARD);
-    } catch (const pcsc_cpp::ScardCardRemovedError&) {
+    } catch (const pcsc_cpp::SCardCardRemovedError&) {
         throw AutoSelectFailed(readers.size() > 1
                                    ? AutoSelectFailed::Reason::MULTIPLE_READERS_NO_CARD
                                    : AutoSelectFailed::Reason::SINGLE_READER_NO_CARD);

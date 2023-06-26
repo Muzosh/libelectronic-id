@@ -12,6 +12,7 @@ add_library(${PROJECT_NAME}
   include/${PROJECT_NAME}/${PROJECT_NAME}.hpp
   include/${PROJECT_NAME}/enums.hpp
   src/availableSupportedCards.cpp
+  src/availableSupportedSerialDevices.cpp
   src/${PROJECT_NAME}.cpp
   src/electronic-ids/common.hpp
   src/electronic-ids/common.cpp
@@ -36,6 +37,10 @@ add_library(${PROJECT_NAME}
   src/electronic-ids/pkcs11/pkcs11.h
   src/electronic-ids/pkcs11/Pkcs11ElectronicID.cpp
   src/electronic-ids/pkcs11/Pkcs11ElectronicID.hpp
+  src/electronic-ids/serial/InfinitEIDPQ.cpp
+  src/electronic-ids/serial/InfinitEIDPQ.hpp
+  src/electronic-ids/serial/serial-common.hpp
+  src/electronic-ids/serial/SerialElectronicID.hpp
   $<$<PLATFORM_ID:Windows>:
     src/electronic-ids/ms-cryptoapi/listMsCryptoApiElectronicIDs.cpp
     src/electronic-ids/ms-cryptoapi/listMsCryptoApiElectronicIDs.hpp
@@ -49,18 +54,26 @@ target_include_directories(${PROJECT_NAME}
   include
 )
 
+find_package(Qt6 REQUIRED COMPONENTS SerialPort)
+
 find_package(OpenSSL REQUIRED)
 
 target_link_libraries(${PROJECT_NAME}
   pcsc-cpp
+  serial-cpp
   ${CMAKE_DL_LIBS}
   OpenSSL::Crypto
   $<$<PLATFORM_ID:Windows>: Shlwapi Crypt32 Ncrypt>
+  Qt6::SerialPort
 )
 
 # libpcsc-cpp dependency.
 
 add_subdirectory(lib/libpcsc-cpp)
+
+# libserial-cpp dependency.
+
+add_subdirectory(lib/libserial-cpp)
 
 # Common testing options.
 
