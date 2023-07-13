@@ -1,3 +1,6 @@
+# branch: feature-abstraction-layer-and-InfinitEIDPQ
+This branch implements necessary code changes in the https://github.com/Muzosh/Post-Quantum-Authentication-On-The-Web project. It adopts the new Web-eID abstraction layer and InfinitEIDPQ interface in order to allow users to authenticate with ESP32 enabled embedded devices, that are capable of creating Dilithium5 post-quantum signatures.
+
 # libelectronic-id
 
 ![European Regional Development Fund](https://github.com/open-eid/DigiDoc4-Client/blob/master/client/images/EL_Regionaalarengu_Fond.png)
