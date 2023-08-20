@@ -49,6 +49,7 @@ public:
         LatEID,
         LitEID,
         HrvEID,
+        InfEID,
         BelEIDV1_7,
         BelEIDV1_8,
 #ifdef _WIN32
