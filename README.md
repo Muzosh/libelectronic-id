@@ -16,7 +16,11 @@ This branch implements necessary code changes in the <https://github.com/Muzosh/
 
 * follow the build instructions in [official Web-eID repository](https://github.com/web-eid/web-eid-app#building-and-testing)
 * builded app will work with InfinitEID
-* for example, on MacOS you can replace the official Web-eID.app (installed from [here](https://web-eid.eu/)) by builded application from `./build/src/app/Web-eID.app`
+* it is better to build an installer instead of just single app:
+    * see the [.github workflows](https://github.com/web-eid/web-eid-app/tree/main/.github/workflows) for OS-specific cmake targets
+    * for example on MacOS:
+        * `cmake --build ${BUILD_DIR} --config ${BUILD_TYPE} --target installer` for Chrome and Firefox
+        * `cmake --build ${BUILD_DIR} --config ${BUILD_TYPE} --target installer-safari` for Safari
 
 # libelectronic-id
 
