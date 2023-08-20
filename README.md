@@ -1,3 +1,23 @@
+# branch: feature-InfinitEID
+
+This branch implements necessary code changes in the <https://github.com/Muzosh/Smart-Card-Authentication-On-The-Web> project. It adopts the InfinitEID interface in order to allow users to authenticate with custom-built non-state-issued smart cards.
+
+## Installation
+
+### Initialize Web-eID native application with InfinitEID implementation submodule
+
+* `git clone https://github.com/web-eid/web-eid-app && cd web-eid-app`
+* `git submodule set-url lib/libelectronic-id https://github.com/Muzosh/libelectronic-id && git submodule set-branch --branch feature-InfinitEID lib/libelectronic-id`
+* `git submodule update --init --remote --recursive`
+* **add line `{JsonWebSignatureAlgorithm::ES256, QCryptographicHash::Sha256},` to the map in `createSignature` function in `src/controller/command-handlers/authenticate.cpp`**
+* **change the ATR according to your card** in `lib/libelectronic-id/src/electronic-id.cpp` in `SUPPORTED_ATRS` map
+
+### Build modified Web-eID native application
+
+* follow the build instructions in [official Web-eID repository](https://github.com/web-eid/web-eid-app#building-and-testing)
+* builded app will work with InfinitEID
+* for example, on MacOS you can replace the official Web-eID.app (installed from [here](https://web-eid.eu/)) by builded application from `./build/src/app/Web-eID.app`
+
 # libelectronic-id
 
 ![European Regional Development Fund](https://github.com/open-eid/DigiDoc4-Client/blob/master/client/images/EL_Regionaalarengu_Fond.png)
@@ -50,5 +70,5 @@ service, run them inside `build` directory with:
 
 ## Development guidelines
 
-- Format code with `scripts/clang-format.sh` before committing
-- See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)
+* Format code with `scripts/clang-format.sh` before committing
+* See [docs/DEVELOPMENT.md](docs/DEVELOPMENT.md)
