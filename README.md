@@ -12,7 +12,7 @@ This branch implements necessary code changes in the <https://github.com/Muzosh/
 * **add line `{JsonWebSignatureAlgorithm::ES256, QCryptographicHash::Sha256},` to the map in `createSignature` function in `src/controller/command-handlers/authenticate.cpp`**
 * **change the ATR according to your card** in `lib/libelectronic-id/src/electronic-id.cpp` in `SUPPORTED_ATRS` map
 
-### Build modified Web-eID native application
+### Build modified Web-eID native application or download it from [Releases](https://github.com/Muzosh/libelectronic-id/releases)
 
 * follow the build instructions in [official Web-eID repository](https://github.com/web-eid/web-eid-app#building-and-testing)
 * builded app will work with InfinitEID
